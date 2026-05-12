@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>점심 메뉴 사다리타기</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", Arial, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+
+    .page {
+      min-height: 100vh;
+      padding: 32px;
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: center;
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+      margin-bottom: 24px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #f1f5f9;
+      color: #475569;
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 40px;
+      letter-spacing: -1px;
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 800;
+      transition: 0.2s ease;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    .btn {
+      min-height: 46px;
+      border-radius: 16px;
+      padding: 0 18px;
+      background: #0f172a;
+      color: white;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
+    }
+
+    .btn.secondary {
+      background: #ffffff;
+      color: #334155;
+      border: 1px solid #e2e8f0;
+      box-shadow: none;
+    }
+
+    .btn.danger {
+      background: #fff1f2;
+      color: #e11d48;
+      box-shadow: none;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 24px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .subtext {
+      margin: 7px 0 18px;
+      color: #64748b;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 13px 14px;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    input:focus {
+      border-color: #94a3b8;
+      box-shadow: 0 0 0 4px rgba(148, 163, 184, 0.16);
+    }
+
+    .menu-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .menu-item {
+      display: grid;
+      grid-template-columns: 36px 1fr 42px;
+      gap: 8px;
+      align-items: center;
+      background: #f8fafc;
+      border-radius: 18px;
+      padding: 8px;
+    }
+
+    .menu-index {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 36px;
+      border-radius: 13px;
+      background: #ffffff;
+      color: #64748b;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .menu-item input {
+      border: 0;
+      background: transparent;
+      padding: 9px 4px;
+      font-weight: 800;
+      box-shadow: none;
+    }
+
+    .delete-btn {
+      height: 36px;
+      border-radius: 13px;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 18px;
+    }
+
+    .delete-btn:hover {
+      background: #ffffff;
+      color: #e11d48;
+    }
+
+    .warning {
+      margin-top: 14px;
+      border-radius: 16px;
+      background: #fffbeb;
+      color: #b45309;
+      padding: 13px;
+      font-size: 14px;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .ladder-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .count-chip {
+      flex-shrink: 0;
+      border-radius: 16px;
+      background: #f1f5f9;
+      color: #475569;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .ladder-box {
+      min-height: 470px;
+      border-radius: 28px;
+      background: linear-gradient(180deg, #f8fafc, #ffffff);
+      padding: 24px;
+      overflow-x: auto;
+    }
+
+    .ladder-stage {
+      position: relative;
+      min-width: 560px;
+      height: 360px;
+      margin: 0 auto;
+    }
+
+    .vertical-line {
+      position: absolute;
+      top: 18px;
+      bottom: 40px;
+      width: 3px;
+      border-radius: 999px;
+      background: #cbd5e1;
+      transform: translateX(-50%);
+    }
+
+    .horizontal-line {
+      position: absolute;
+      height: 3px;
+      border-radius: 999px;
+      background: #cbd5e1;
+    }
+
+    .top-node,
+    .bottom-node {
+      position: absolute;
+      transform: translateX(-50%);
+      z-index: 3;
+      border-radius: 15px;
+      background: #ffffff;
+      color: #334155;
+      padding: 9px 12px;
+      font-size: 14px;
+      font-weight: 900;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+      white-space: nowrap;
+      transition: 0.2s ease;
+    }
+
+    .top-node {
+      top: 0;
+    }
+
+    .bottom-node {
+      bottom: 0;
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .active-node,
+    .winner-node {
+      background: #0f172a;
+      color: #ffffff;
+      transform: translateX(-50%) translateY(-4px) scale(1.06);
+    }
+
+    .result-area {
+      display: flex;
+      justify-content: center;
+      margin-top: 24px;
+    }
+
+    .placeholder,
+    .result-card {
+      border-radius: 24px;
+      text-align: center;
+      padding: 18px 28px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    .placeholder {
+      background: #ffffff;
+      color: #64748b;
+      font-weight: 700;
+    }
+
+    .result-card {
+      background: #0f172a;
+      color: #ffffff;
+      display: none;
+      animation: pop 0.24s ease-out;
+    }
+
+    .result-card .label {
+      color: #cbd5e1;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .result-card .menu {
+      font-size: 34px;
+      font-weight: 1000;
+      letter-spacing: -0.5px;
+    }
+
+    .small-note {
+      margin-top: 16px;
+      color: #94a3b8;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    @keyframes pop {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .page {
+        padding: 18px;
+      }
+
+      .hero {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .hero-actions {
+        justify-content: stretch;
+      }
+
+      .hero-actions .btn {
+        flex: 1;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="container">
+      <section class="hero">
+        <div>
+          <div class="badge">🍽️ 오늘 점심 뭐 먹지?</div>
+          <h1>점심 메뉴 사다리타기</h1>
+          <p>매일 후보 메뉴를 바꿔 입력하고, 버튼 한 번으로 오늘의 메뉴를 뽑아보세요.</p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn secondary" id="resetBtn">↻ 초기화</button>
+          <button class="btn" id="startBtn">⇄ 사다리 시작</button>
+        </div>
+      </section>
+
+      <section class="layout">
+        <aside class="card">
+          <h2>메뉴 입력</h2>
+          <p class="subtext">오늘 먹을 후보를 자유롭게 추가하거나 수정하세요. 입력한 메뉴는 이 브라우저에 자동 저장됩니다.</p>
+
+          <div class="input-row">
+            <input id="newMenuInput" type="text" placeholder="예: 마라탕" />
+            <button class="btn" id="addBtn">＋</button>
+          </div>
+
+          <div class="menu-list" id="menuList"></div>
+
+          <div class="warning" id="warningText">
+            사다리타기를 하려면 메뉴를 최소 2개 이상 입력해야 합니다.
+          </div>
+
+          <p class="small-note">
+            사용법: 메뉴를 추가하거나 기존 메뉴명을 수정한 뒤, 오른쪽 위의 사다리 시작 버튼을 누르면 됩니다.
+          </p>
+        </aside>
+
+        <section class="card">
+          <div class="ladder-header">
+            <div>
+              <h2>사다리 결과</h2>
+              <p class="subtext">후보가 바뀌면 사다리도 새로 그려집니다.</p>
+            </div>
+            <div class="count-chip" id="countChip">후보 0개</div>
+          </div>
+
+          <div class="ladder-box">
+            <div class="ladder-stage" id="ladderStage"></div>
+            <div class="result-area">
+              <div class="placeholder" id="placeholder">메뉴를 입력한 뒤 사다리 시작 버튼을 눌러주세요.</div>
+              <div class="result-card" id="resultCard">
+                <div class="label">오늘의 점심 메뉴</div>
+                <div class="menu" id="resultMenu"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "lunch-ladder-menus";
+    const defaultMenus = ["김치찌개", "돈까스", "제육볶음", "초밥", "쌀국수"];
+
+    const menuList = document.getElementById("menuList");
+    const newMenuInput = document.getElementById("newMenuInput");
+    const addBtn = document.getElementById("addBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const startBtn = document.getElementById("startBtn");
+    const warningText = document.getElementById("warningText");
+    const countChip = document.getElementById("countChip");
+    const ladderStage = document.getElementById("ladderStage");
+    const placeholder = document.getElementById("placeholder");
+    const resultCard = document.getElementById("resultCard");
+    const resultMenu = document.getElementById("resultMenu");
+
+    let menus = loadMenus();
+    let ladderLines = [];
+    let isRunning = false;
+    let winnerIndex = null;
+    let activeIndex = null;
+
+    function loadMenus() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return [...defaultMenus];
+        const parsed = JSON.parse(saved);
+        if (!Array.isArray(parsed)) return [...defaultMenus];
+        const cleaned = parsed.map((item) => String(item).trim()).filter(Boolean);
+        return cleaned.length ? cleaned : [...defaultMenus];
+      } catch (error) {
+        return [...defaultMenus];
+      }
+    }
+
+    function saveMenus() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(menus));
+    }
+
+    function getCleanMenus() {
+      return menus.map((menu) => menu.trim()).filter(Boolean);
+    }
+
+    function renderMenus() {
+      menuList.innerHTML = "";
+
+      menus.forEach((menu, index) => {
+        const item = document.createElement("div");
+        item.className = "menu-item";
+
+        const number = document.createElement("div");
+        number.className = "menu-index";
+        number.textContent = index + 1;
+
+        const input = document.createElement("input");
+        input.value = menu;
+        input.placeholder = "메뉴명";
+        input.addEventListener("input", () => {
+          menus[index] = input.value;
+          saveMenus();
+          resetResult();
+          renderLadder();
+        });
+
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "delete-btn";
+        deleteButton.type = "button";
+        deleteButton.textContent = "×";
+        deleteButton.title = "삭제";
+        deleteButton.addEventListener("click", () => {
+          menus.splice(index, 1);
+          saveMenus();
+          resetResult();
+          render();
+        });
+
+        item.appendChild(number);
+        item.appendChild(input);
+        item.appendChild(deleteButton);
+        menuList.appendChild(item);
+      });
+    }
+
+    function makeLadderLines(count) {
+      const rows = 7;
+      const lines = [];
+
+      if (count < 2) return lines;
+
+      for (let row = 0; row < rows; row++) {
+        const used = new Set();
+        const maxLines = Math.max(1, Math.floor(count / 2));
+        const lineCount = Math.floor(Math.random() * maxLines) + 1;
+
+        for (let i = 0; i < lineCount; i++) {
+          const col = Math.floor(Math.random() * (count - 1));
+          if (!used.has(col) && !used.has(col - 1) && !used.has(col + 1)) {
+            used.add(col);
+            lines.push({ row, col });
+          }
+        }
+      }
+
+      return lines;
+    }
+
+    function renderLadder() {
+      const cleanMenus = getCleanMenus();
+      const count = cleanMenus.length;
+      ladderStage.innerHTML = "";
+
+      countChip.textContent = `후보 ${count}개`;
+      warningText.style.display = count < 2 ? "block" : "none";
+      startBtn.disabled = count < 2 || isRunning;
+
+      if (count < 2) {
+        ladderStage.style.minWidth = "560px";
+        return;
+      }
+
+      const stageWidth = Math.max(560, count * 120);
+      ladderStage.style.width = stageWidth + "px";
+      ladderStage.style.minWidth = stageWidth + "px";
+
+      if (!ladderLines.length) {
+        ladderLines = makeLadderLines(count);
+      }
+
+      const leftPositions = cleanMenus.map((_, index) => {
+        if (count === 1) return stageWidth / 2;
+        return 48 + index * ((stageWidth - 96) / (count - 1));
+      });
+
+      leftPositions.forEach((left, index) => {
+        const vertical = document.createElement("div");
+        vertical.className = "vertical-line";
+        vertical.style.left = left + "px";
+        ladderStage.appendChild(vertical);
+
+        const topNode = document.createElement("div");
+        topNode.className = "top-node";
+        if (activeIndex === index) topNode.classList.add("active-node");
+        topNode.style.left = left + "px";
+        topNode.textContent = index + 1;
+        ladderStage.appendChild(topNode);
+
+        const bottomNode = document.createElement("div");
+        bottomNode.className = "bottom-node";
+        if (winnerIndex === index) bottomNode.classList.add("winner-node");
+        bottomNode.style.left = left + "px";
+        bottomNode.textContent = cleanMenus[index];
+        bottomNode.title = cleanMenus[index];
+        ladderStage.appendChild(bottomNode);
+      });
+
+      ladderLines.forEach((line) => {
+        if (line.col >= count - 1) return;
+
+        const startX = leftPositions[line.col];
+        const endX = leftPositions[line.col + 1];
+        const y = 70 + line.row * 36;
+
+        const horizontal = document.createElement("div");
+        horizontal.className = "horizontal-line";
+        horizontal.style.left = startX + "px";
+        horizontal.style.top = y + "px";
+        horizontal.style.width = endX - startX + "px";
+        ladderStage.appendChild(horizontal);
+      });
+    }
+
+    function addMenu() {
+      const value = newMenuInput.value.trim();
+      if (!value) return;
+
+      const exists = menus.some((menu) => menu.trim() === value);
+      if (exists) {
+        newMenuInput.value = "";
+        return;
+      }
+
+      menus.push(value);
+      newMenuInput.value = "";
+      saveMenus();
+      resetResult();
+      ladderLines = [];
+      render();
+    }
+
+    function resetResult() {
+      winnerIndex = null;
+      activeIndex = null;
+      placeholder.style.display = "block";
+      resultCard.style.display = "none";
+      resultMenu.textContent = "";
+    }
+
+    function startLadder() {
+      const cleanMenus = getCleanMenus();
+      if (cleanMenus.length < 2 || isRunning) return;
+
+      isRunning = true;
+      startBtn.textContent = "선택 중...";
+      startBtn.disabled = true;
+      winnerIndex = null;
+      activeIndex = null;
+      placeholder.style.display = "block";
+      resultCard.style.display = "none";
+
+      ladderLines = makeLadderLines(cleanMenus.length);
+      renderLadder();
+
+      let tick = 0;
+      const totalTicks = 24;
+
+      const timer = setInterval(() => {
+        activeIndex = Math.floor(Math.random() * cleanMenus.length);
+        tick++;
+        renderLadder();
+
+        if (tick >= totalTicks) {
+          clearInterval(timer);
+          winnerIndex = Math.floor(Math.random() * cleanMenus.length);
+          activeIndex = winnerIndex;
+          isRunning = false;
+          startBtn.textContent = "⇄ 사다리 시작";
+          startBtn.disabled = false;
+
+          resultMenu.textContent = cleanMenus[winnerIndex];
+          placeholder.style.display = "none";
+          resultCard.style.display = "block";
+          renderLadder();
+        }
+      }, 85);
+    }
+
+    function resetMenus() {
+      menus = [...defaultMenus];
+      saveMenus();
+      resetResult();
+      ladderLines = [];
+      render();
+    }
+
+    function render() {
+      renderMenus();
+      renderLadder();
+    }
+
+    addBtn.addEventListener("click", addMenu);
+    resetBtn.addEventListener("click", resetMenus);
+    startBtn.addEventListener("click", startLadder);
+
+    newMenuInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") addMenu();
+    });
+
+    window.addEventListener("resize", renderLadder);
+
+    render();
+  </script>
+</body>
+</html>
